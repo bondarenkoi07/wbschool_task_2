@@ -11,11 +11,17 @@ import (
 
 type IFlagChainNode interface {
 	SetBuilder(*strings.Builder)
+	SetNext(IFlagChainNode)
 	Manage([]byte, bool)
 }
 
 type MatchedFlag struct {
 	builder *strings.Builder
+	next    IFlagChainNode
+}
+
+func (m *MatchedFlag) SetNext(next IFlagChainNode) {
+	m.next = next
 }
 
 func (m *MatchedFlag) SetBuilder(builder *strings.Builder) {
@@ -33,6 +39,11 @@ type PostFlag struct {
 	builder *strings.Builder
 	buf     [][]byte
 	matched bool
+	next    IFlagChainNode
+}
+
+func (p *PostFlag) Matched() bool {
+	return p.matched
 }
 
 func (p *PostFlag) SetBuilder(builder *strings.Builder) {
@@ -40,30 +51,45 @@ func (p *PostFlag) SetBuilder(builder *strings.Builder) {
 }
 
 func (p *PostFlag) Manage(slice []byte, matched bool) {
+	switch p.next.(type) {
+	case *PreFlag:
+		p.next.(*PreFlag).SetMatchedPost(p.Matched())
+	}
+
+	//fmt.Printf("POSTFLAG: input match %v, own match %v, next slice %s\n", next,p.next, string(slice))
 	if matched { // match pattern, skip buffer writing
 		(*p).matched = true
 	} else if p.matched { // start writing in buffer until cap
 		if len(p.buf) < cap(p.buf) {
+			//fmt.Println("appended")
 			(*p).buf = append((*p).buf, slice)
-		} else { // if len() == cap() stop writing in buffer
-			(*p).matched = false
-			for _, value := range p.buf {
-				(*p).builder.Grow(len(slice))
-				(*p).builder.Write(value)
+			//fmt.Println(len((*p).buf))
+			(*p).builder.Grow(len(slice))
+			(*p).builder.Write(slice)
+			if len(p.buf) == cap(p.buf) {
+				(*p).matched = false
+				(*p).buf = (*p).buf[:0]
 			}
-			(*p).buf = (*p).buf[:0]
 		}
 	}
+	if p.next != nil {
+		p.next.Manage(slice, matched)
+	}
+
 }
 
-func (p *PostFlag) Next() {
-
+func (p *PostFlag) SetNext(node IFlagChainNode) {
+	(*p).next = node
 }
 
 type CounterFlag struct {
 	builder *strings.Builder
 	next    IFlagChainNode
 	index   uint
+}
+
+func (c *CounterFlag) SetNext(next IFlagChainNode) {
+	c.next = next
 }
 
 func (c *CounterFlag) Index() uint {
@@ -81,14 +107,23 @@ func (c *CounterFlag) Manage(slice []byte, matched bool) {
 }
 
 type PreFlag struct {
-	buf     [][]byte
-	builder *strings.Builder
-	post    *PostFlag
-	matched *MatchedFlag
+	buf         [][]byte
+	builder     *strings.Builder
+	next        IFlagChainNode
+	matchedPost bool
+}
+
+func (p *PreFlag) SetNext(next IFlagChainNode) {
+	p.next = next
+}
+
+func (p *PreFlag) SetMatchedPost(matchedPost bool) {
+	p.matchedPost = matchedPost
 }
 
 func (p *PreFlag) Manage(slice []byte, matched bool) {
-	if !matched {
+
+	if !matched && !p.matchedPost {
 		if len(p.buf) < cap(p.buf) {
 			(*p).buf = append(p.buf, slice)
 		} else {
@@ -96,15 +131,12 @@ func (p *PreFlag) Manage(slice []byte, matched bool) {
 			(*p).buf = append(p.buf, slice)
 		}
 	} else {
-		if p.post != nil {
-			(*p.post).Manage(slice, matched)
-		}
 		for _, value := range p.buf {
 			(*p).builder.Grow(len(value))
 			(*p).builder.Write(value)
 		}
 		(*p).buf = (*p).buf[:0]
-		(*p.matched).Manage(slice, matched)
+		(*p).next.Manage(slice, matched)
 		//(*p).builder.Write(slice)
 	}
 }
@@ -117,6 +149,7 @@ type Grep struct {
 	builder *strings.Builder
 	regex   *regexp.Regexp
 	output  IFlagChainNode
+	exclude bool
 }
 
 func (p *Grep) SetRegex(regex *regexp.Regexp) {
@@ -127,7 +160,7 @@ func (p *Grep) SetBuilder(builder *strings.Builder) {
 	(*p).builder = builder
 }
 
-func (p *Grep) DoStaff(reader io.Reader) error {
+func (p *Grep) DoStaff(reader io.Reader) (error, string) {
 	bufReader := bufio.NewReader(reader)
 	var (
 		err     error
@@ -138,14 +171,13 @@ func (p *Grep) DoStaff(reader io.Reader) error {
 		slice, err = bufReader.ReadSlice('\n')
 		if err == nil {
 			matched = (*p).regex.Match(slice)
+			if p.exclude {
+				matched = !matched
+			}
 			(*p).output.Manage(slice, matched)
 		} else if err != io.EOF {
 			fmt.Println(err)
 		}
 	}
-	fmt.Println("\nOutuput:\n", (*p).builder.String())
-	return err
+	return err, (*p).builder.String()
 }
-
-//DONE: responsive chain should consist task logic in DoStaff method,
-// use single reader and delegate matching one to other
