@@ -49,7 +49,7 @@ func main() {
 		flags = append(flags, &CounterFlag{builder: builder})
 	} else {
 		if *numCounterPtr {
-			flags = append(flags, &CounterFlag{builder: builder})
+			flags = append(flags, &IndexFlag{})
 		}
 
 		if *ContextPtr > 0 {

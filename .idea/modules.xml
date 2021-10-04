@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../exactmatch/.idea/exactmatch.iml" filepath="$PROJECT_DIR$/../exactmatch/.idea/exactmatch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../offline-search/.idea/offline-search.iml" filepath="$PROJECT_DIR$/../offline-search/.idea/offline-search.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/wbschool_task_2.iml" filepath="$PROJECT_DIR$/.idea/wbschool_task_2.iml" />
     </modules>
   </component>

@@ -82,25 +82,20 @@ func (p *PostFlag) SetNext(node IFlagChainNode) {
 	(*p).next = node
 }
 
-type CounterFlag struct {
-	builder *strings.Builder
-	next    IFlagChainNode
-	index   uint
+type IndexFlag struct {
+	next  IFlagChainNode
+	index uint
 }
 
-func (c *CounterFlag) SetNext(next IFlagChainNode) {
+func (c *IndexFlag) SetNext(next IFlagChainNode) {
 	c.next = next
 }
 
-func (c *CounterFlag) Index() uint {
-	return c.index
+func (c *IndexFlag) SetBuilder(builder *strings.Builder) {
+
 }
 
-func (c *CounterFlag) SetBuilder(builder *strings.Builder) {
-	(*c).builder = builder
-}
-
-func (c *CounterFlag) Manage(slice []byte, matched bool) {
+func (c *IndexFlag) Manage(slice []byte, matched bool) {
 	(*c).index++
 	slice = append([]byte(strconv.Itoa(int(c.index))+":"), slice...)
 	(*c).next.Manage(slice, matched)
@@ -143,6 +138,29 @@ func (p *PreFlag) Manage(slice []byte, matched bool) {
 
 func (p *PreFlag) SetBuilder(builder *strings.Builder) {
 	(*p).builder = builder
+}
+
+type CounterFlag struct {
+	builder *strings.Builder
+	next    IFlagChainNode
+	index   uint
+}
+
+func (c *CounterFlag) SetBuilder(builder *strings.Builder) {
+	(*c).builder = builder
+}
+
+func (c *CounterFlag) SetNext(node IFlagChainNode) {
+	(*c).next = nil
+}
+
+func (c *CounterFlag) Manage(bytes []byte, matched bool) {
+	if matched {
+		(*c).builder.Reset()
+		(*c).index++
+		(*c).builder.Grow(len(strconv.Itoa(int((*c).index))))
+		(*c).builder.Write([]byte(strconv.Itoa(int((*c).index))))
+	}
 }
 
 type Grep struct {
