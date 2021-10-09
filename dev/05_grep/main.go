@@ -23,14 +23,22 @@ func main() {
 		builder       = &strings.Builder{}
 		pattern       = flag.String("pattern", "", "паттерн поиска")
 		filepath      = flag.String("filepath", "", "путь к файлу")
+		reader        *os.File
 		node          IFlagChainNode
 		root          IFlagChainNode
 	)
 
 	flag.Parse()
-	file, err := os.OpenFile(*filepath, os.O_RDONLY, 0744)
-	if err != nil {
-		log.Fatalf("error: %v, filepath %s", err, *filepath)
+
+	if *filepath == "" {
+		reader = os.Stdin
+	} else {
+		file, err := os.OpenFile(*filepath, os.O_RDONLY, 0744)
+		if err != nil {
+			log.Fatalf("error: %v, filepath %s", err, *filepath)
+		}
+
+		reader = file
 	}
 
 	if *FixedPtr {
@@ -84,7 +92,7 @@ func main() {
 
 	grepMaster := Grep{builder: builder, regex: regex, output: root, exclude: *inversionPtr}
 
-	err, str := grepMaster.DoStaff(file)
+	err, str := grepMaster.DoStaff(reader)
 	if err != nil && err != io.EOF {
 		log.Fatal(err)
 	}

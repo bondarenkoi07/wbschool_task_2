@@ -108,7 +108,6 @@ func FetchStrings(buf *bufio.Reader) ([]string, error) {
 	for err != io.EOF {
 		readString, err = buf.ReadString('\n')
 		if err != nil && err != io.EOF {
-			log.Printf("this error: %v\n", err)
 			return nil, err
 		}
 		//fmt.Printf("fetched! %s\n", readString)
