@@ -1,0 +1,20 @@
+ilia      190707  0.1  1.9 2560540 155064 ?      Sl   14:51   0:05 /usr/lib/firefox/firefox -contentproc -childID 6 -isForBrowser -prefsLen 6098 -prefMapSize 242040 -jsInit 285716 -parentBuildID 20210903235534 -appdir /usr/lib/firefox/browser 189905 true tab
+root      190777  0.2  0.0      0     0 ?        I    14:57   0:10 [kworker/1:1-events]
+root      190779  0.0  0.0      0     0 ?        I    14:57   0:01 [kworker/u16:0-events_power_efficient]
+root      190935  0.0  0.0      0     0 ?        I    15:27   0:00 [kworker/u16:1-i915]
+ilia      190952  5.7  4.2 2877780 339748 ?      Sl   15:28   2:29 /usr/lib/firefox/firefox -contentproc -childID 7 -isForBrowser -prefsLen 6098 -prefMapSize 242040 -jsInit 285716 -parentBuildID 20210903235534 -appdir /usr/lib/firefox/browser 189905 true tab
+ilia      190993  0.0  0.0 360064  5636 ?        Sl   15:29   0:00 /usr/lib/speech-dispatcher-modules/sd_dummy /etc/speech-dispatcher/modules/dummy.conf
+ilia      190996  0.0  0.0 360096  5992 ?        Sl   15:29   0:00 /usr/lib/speech-dispatcher-modules/sd_generic /etc/speech-dispatcher/modules/mary-generic.conf
+ilia      190999  0.0  0.1 459008  8296 ?        Sl   15:29   0:00 /usr/lib/speech-dispatcher-modules/sd_espeak-ng /etc/speech-dispatcher/modules/espeak-ng.conf
+ilia      191005  0.0  0.0 168364  2220 ?        Ssl  15:29   0:00 /usr/bin/speech-dispatcher --spawn --communication-method unix_socket --socket-path /run/user/1000/speech-dispatcher/speechd.sock
+ilia      191328  0.5  2.0 2611360 166284 ?      Sl   15:43   0:09 /usr/lib/firefox/firefox -contentproc -childID 8 -isForBrowser -prefsLen 6098 -prefMapSize 242040 -jsInit 285716 -parentBuildID 20210903235534 -appdir /usr/lib/firefox/browser 189905 true tab
+root      191398  0.2  0.0      0     0 ?        I    15:43   0:03 [kworker/0:0-events]
+root      191586  0.0  0.0      0     0 ?        I    15:52   0:00 [kworker/2:0-cgroup_destroy]
+root      191681  0.0  0.0      0     0 ?        I    15:58   0:00 [kworker/0:2-cgroup_destroy]
+ilia      192123  1.6  2.9 2824920 236784 ?      Sl   16:03   0:08 /usr/lib/firefox/firefox -contentproc -childID 9 -isForBrowser -prefsLen 6098 -prefMapSize 242040 -jsInit 285716 -parentBuildID 20210903235534 -appdir /usr/lib/firefox/browser 189905 true tab
+root      192323  0.0  0.0      0     0 ?        I    16:08   0:00 [kworker/0:1-events]
+root      192483  0.0  0.0      0     0 ?        I    16:11   0:00 [kworker/u16:2]
+ilia      192501  0.7  0.9 2389148 73436 ?       Sl   16:12   0:00 /usr/lib/firefox/firefox -contentproc -childID 10 -isForBrowser -prefsLen 6098 -prefMapSize 242040 -jsInit 285716 -parentBuildID 20210903235534 -appdir /usr/lib/firefox/browser 189905 true tab
+ilia      192534  0.0  0.0  20356  3548 pts/2    R+   16:12   0:00 ps -aux
+ilia      192535  0.0  0.0  20180  3736 pts/2    D+   16:12   0:00 /bin/bash --rcfile /snap/goland/151/plugins/terminal/jediterm-bash.in -i
+ilia      192536  0.0  0.0  16860   592 pts/2    S+   16:12   0:00 cat
