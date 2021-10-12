@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"io"
 	"log"
 	"net"
@@ -14,8 +13,7 @@ import (
 )
 
 type Client struct {
-	c    net.Conn
-	mute chan struct{}
+	c net.Conn
 }
 
 func NewClient(ip string, port int, timeout time.Duration) *Client {
@@ -39,7 +37,6 @@ func (c *Client) reader(r io.Reader) {
 			return
 		}
 		println("Client got:\"", string(buf[0:n]), "\"")
-		(*c).mute <- struct{}{}
 	}
 }
 
@@ -52,20 +49,17 @@ func (c *Client) ListenAndServe() {
 	}((*c).c)
 
 	go (*c).reader((*c).c)
+	scanner := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Println("Enter your message:")
-		var text string
-		scanner := bufio.NewScanner(os.Stdin)
-
-		if scanner.Scan() {
-			text = scanner.Text()
+		readSlice, err := scanner.ReadSlice('\n')
+		if err == io.EOF {
+			break
 		}
-
-		_, err := (*c).c.Write([]byte(text))
+		_, err = (*c).c.Write(readSlice)
 		if err != nil {
-			log.Fatal("write error:", err)
+			log.Fatal("write error: ", err)
 		}
-		<-(*c).mute
+
 	}
 }
 
@@ -75,6 +69,9 @@ func main() {
 		port    = flag.Int("port", 80, "current port to listen")
 		timeout = flag.Duration("timeout", time.Second*15, "timeout to connect")
 	)
+	flag.Parse()
+
+	//sig := make(chan os.Signal)
 
 	if *host == "" {
 		log.Fatal("please, use flag host to describe source host")
