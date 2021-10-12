@@ -39,12 +39,12 @@ func (s *Service) parse(description, date string) (calendar.Event, error) {
 	}
 
 	RawMonth, err = strconv.Atoi(dateParts[2])
-	if err != nil || RawMonth <= 0 || day >= 13 {
+	if err != nil || RawMonth <= 0 || RawMonth >= 13 {
 		return calendar.Event{}, errors.New(fmt.Sprintf(ParseDateErrorFormat, date))
 	}
 
 	day, err = strconv.Atoi(dateParts[1])
-	if err != nil || day <= 0 {
+	if err != nil || day <= 0 || day > 31 {
 		return calendar.Event{}, errors.New(fmt.Sprintf(ParseDateErrorFormat, date))
 	}
 

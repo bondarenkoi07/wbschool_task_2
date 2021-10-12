@@ -73,7 +73,7 @@ func (c *Calendar) FilterByDay(date time.Time) []Event {
 	output := make([]Event, 0, len(c.events))
 	(*c).RLock()
 	for _, day := range c.events {
-		if NextDay.After(day.Date) && date.Before(NextDay) {
+		if NextDay.After(day.Date) && date.Before(day.Date) {
 			output = append(output, day)
 		}
 	}

@@ -59,12 +59,13 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(cut)
+	fmt.Print(cut)
 }
 
+// ParseColumns fetch column that should be cut from source
 func ParseColumns(rawCols string) ([]int, error) {
 	atoi, err := strconv.Atoi(rawCols)
-	if err == nil {
+	if err == nil && atoi > 0 {
 		return []int{atoi - 1}, nil
 	}
 
@@ -74,6 +75,13 @@ func ParseColumns(rawCols string) ([]int, error) {
 	if len(parsedCols) == 3 {
 		a, _ := strconv.Atoi(string(parsedCols[1]))
 		b, _ := strconv.Atoi(string(parsedCols[2]))
+
+		if a < 0 {
+			a = -a
+		}
+		if b < 0 {
+			b = -b
+		}
 
 		if a > b {
 			a, b = b, a
@@ -88,7 +96,7 @@ func ParseColumns(rawCols string) ([]int, error) {
 
 	parsedCommaCols := strings.Split(rawCols, ",")
 
-	if len(parsedCommaCols) != 0 {
+	if len(parsedCommaCols) != 1 {
 		output := make([]int, 0, len(parsedCommaCols))
 		col := 0
 		for _, value := range parsedCommaCols {
@@ -105,6 +113,7 @@ func ParseColumns(rawCols string) ([]int, error) {
 	return nil, err
 }
 
+// FetchStrings read strings from buf
 func FetchStrings(buf *bufio.Reader) ([]string, error) {
 	var (
 		output     = make([]string, 0, 0)
@@ -124,6 +133,7 @@ func FetchStrings(buf *bufio.Reader) ([]string, error) {
 	return output, nil
 }
 
+// FieldCut cuts columns from source
 func FieldCut(input []string, sep string, separated bool, colNum ...int) (string, error) {
 	var output = strings.Builder{}
 	for _, value := range input {
@@ -138,10 +148,9 @@ func FieldCut(input []string, sep string, separated bool, colNum ...int) (string
 
 		for _, index := range colNum {
 			if index >= len(strSplit) {
-				continue
-				// return nil, errors.New(fmt.Sprintf("invalid column, got %d max %d", index,len(strSplit)))
+				return "", errors.New(fmt.Sprintf("invalid column, got %d max %d", index, len(strSplit)))
 			}
-			_, err := builder.WriteString(strSplit[index])
+			_, err := builder.WriteString(strings.TrimSuffix(strSplit[index], "\n"))
 			if err != nil {
 				return "", err
 			}
@@ -150,11 +159,10 @@ func FieldCut(input []string, sep string, separated bool, colNum ...int) (string
 				return "", err
 			}
 		}
-		log.Printf("was built %v\n", builder.String())
 		output.Grow(builder.Len() + 1)
 		output.WriteString(builder.String())
 		output.WriteRune('\n')
 	}
 
-	return output.String(), nil
+	return strings.TrimSuffix(output.String(), "\n"), nil
 }
