@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	fmt.Println("YESH")
+	fmt.Println("YASH")
 	for {
 		var b bytes.Buffer
 		fmt.Print(">")

@@ -24,13 +24,12 @@ func NewController(service *service.Service) *Controller {
 func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()
-
 		if err != nil {
 			http.Error(w, serializers.SerializeError(err), 500)
+			return
 		}
-
-		date := r.Form.Get("date")
-		desc := r.Form.Get("desc")
+		date := r.FormValue("date")
+		desc := r.FormValue("desc")
 
 		if date != "" && desc != "" {
 			err = (*c).service.Create(desc, date)
@@ -48,11 +47,15 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 				_, err = w.Write([]byte(serializers.SerializeError(nil)))
 				if err != nil {
 					http.Error(w, serializers.SerializeError(err), 500)
+				} else {
+					w.WriteHeader(http.StatusOK)
 				}
 			}
 		} else {
 			http.Error(w, serializers.SerializeError(invalidInputError), 500)
 		}
+	} else {
+		http.Error(w, "wrong method", http.StatusMethodNotAllowed)
 	}
 }
 
@@ -62,6 +65,7 @@ func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			http.Error(w, serializers.SerializeError(err), 500)
+			return
 		}
 
 		id := r.Form.Get("id")
@@ -70,7 +74,7 @@ func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
 
 		Id, err := strconv.Atoi(id)
 
-		if date != "" && desc != "" && err == nil && Id > 0 {
+		if date != "" && desc != "" && err == nil && Id >= 0 {
 			err = (*c).service.Update(uint(Id), desc, date)
 			if err != nil {
 				errorMsg := err.Error()
@@ -86,11 +90,15 @@ func (c *Controller) Update(w http.ResponseWriter, r *http.Request) {
 				_, err = w.Write([]byte(serializers.SerializeError(nil)))
 				if err != nil {
 					http.Error(w, serializers.SerializeError(err), 500)
+				} else {
+					w.WriteHeader(http.StatusOK)
 				}
 			}
 		} else {
 			http.Error(w, serializers.SerializeError(invalidInputError), 500)
 		}
+	} else {
+		http.Error(w, "wrong method", http.StatusMethodNotAllowed)
 	}
 }
 
@@ -98,10 +106,9 @@ func (c *Controller) Delete(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		GET := r.URL.Query()
 		id := GET.Get("id")
-
 		Id, err := strconv.Atoi(id)
 
-		if err == nil && Id > 0 {
+		if err == nil && Id >= 0 {
 			err = (*c).service.Delete(uint(Id))
 			if err != nil {
 				errorMsg := err.Error()
@@ -117,11 +124,15 @@ func (c *Controller) Delete(w http.ResponseWriter, r *http.Request) {
 				_, err = w.Write([]byte(serializers.SerializeError(nil)))
 				if err != nil {
 					http.Error(w, serializers.SerializeError(err), 500)
+				} else {
+					w.WriteHeader(http.StatusOK)
 				}
 			}
 		} else {
 			http.Error(w, serializers.SerializeError(invalidInputError), 500)
 		}
+	} else {
+		http.Error(w, "wrong method", http.StatusMethodNotAllowed)
 	}
 }
 
@@ -132,7 +143,7 @@ func (c *Controller) Read(w http.ResponseWriter, r *http.Request) {
 
 		Id, err := strconv.Atoi(id)
 
-		if err == nil && Id > 0 {
+		if err == nil && Id >= 0 {
 			read, err := (*c).service.Read(uint(Id))
 
 			if err != nil {
@@ -149,31 +160,35 @@ func (c *Controller) Read(w http.ResponseWriter, r *http.Request) {
 				_, err = w.Write([]byte(read))
 				if err != nil {
 					http.Error(w, serializers.SerializeError(err), 500)
+				} else {
+					w.WriteHeader(http.StatusOK)
 				}
 			}
 		} else {
 			http.Error(w, serializers.SerializeError(invalidInputError), 500)
 		}
+	} else {
+		http.Error(w, "wrong method", http.StatusMethodNotAllowed)
 	}
 }
 
 func (c *Controller) ReadAll(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		GET := r.URL.Query()
-		id := GET.Get("id")
-
-		Id, err := strconv.Atoi(id)
-
-		if err == nil && Id > 0 {
+		var err error = nil
+		if err == nil {
 			read := (*c).service.ReadAll()
 			w.Header().Set("Content-Type", "application/json")
 			_, err = w.Write([]byte(read))
 			if err != nil {
 				http.Error(w, serializers.SerializeError(err), 500)
+			} else {
+				w.WriteHeader(http.StatusOK)
 			}
 		} else {
 			http.Error(w, serializers.SerializeError(invalidInputError), 500)
 		}
+	} else {
+		http.Error(w, "wrong method", http.StatusMethodNotAllowed)
 	}
 }
 
@@ -198,11 +213,15 @@ func (c *Controller) FilterByDay(w http.ResponseWriter, r *http.Request) {
 				_, err = w.Write([]byte(read))
 				if err != nil {
 					http.Error(w, serializers.SerializeError(err), 500)
+				} else {
+					w.WriteHeader(http.StatusOK)
 				}
 			}
 		} else {
 			http.Error(w, serializers.SerializeError(invalidInputError), 500)
 		}
+	} else {
+		http.Error(w, "wrong method", http.StatusMethodNotAllowed)
 	}
 }
 
@@ -227,11 +246,15 @@ func (c *Controller) FilterByWeek(w http.ResponseWriter, r *http.Request) {
 				_, err = w.Write([]byte(read))
 				if err != nil {
 					http.Error(w, serializers.SerializeError(err), 500)
+				} else {
+					w.WriteHeader(http.StatusOK)
 				}
 			}
 		} else {
 			http.Error(w, serializers.SerializeError(invalidInputError), 500)
 		}
+	} else {
+		http.Error(w, "wrong method", http.StatusMethodNotAllowed)
 	}
 }
 
@@ -256,10 +279,14 @@ func (c *Controller) FilterByMonth(w http.ResponseWriter, r *http.Request) {
 				_, err = w.Write([]byte(read))
 				if err != nil {
 					http.Error(w, serializers.SerializeError(err), 500)
+				} else {
+					w.WriteHeader(http.StatusOK)
 				}
 			}
 		} else {
 			http.Error(w, serializers.SerializeError(invalidInputError), 400)
 		}
+	} else {
+		http.Error(w, "wrong method", http.StatusMethodNotAllowed)
 	}
 }
