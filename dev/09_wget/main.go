@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"io"
 	"log"
 	"net/http"
@@ -80,9 +81,9 @@ func removeSlash(input string) string {
 }
 
 func main() {
-	var link = "http://db1.mati.su"
-
-	err := Download(link)
+	var link = flag.String("host", "http://db1.mati.su", "host to download")
+	flag.Parse()
+	err := Download(*link)
 	if err != nil {
 		log.Println(err)
 	}

@@ -53,6 +53,10 @@ func (c *Client) ListenAndServe() {
 	for {
 		readSlice, err := scanner.ReadSlice('\n')
 		if err == io.EOF {
+			err = (*c).c.Close()
+			if err != nil {
+				log.Println(err)
+			}
 			break
 		}
 		_, err = (*c).c.Write(readSlice)

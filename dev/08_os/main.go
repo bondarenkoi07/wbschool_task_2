@@ -66,7 +66,7 @@ func call(stack []*exec.Cmd, pipes []*io.PipeWriter) (err error) {
 		}
 		defer func() {
 			if err == nil {
-				pipes[0].Close()
+				_ = pipes[0].Close()
 				err = call(stack[1:], pipes[1:])
 			}
 		}()
